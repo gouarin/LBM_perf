@@ -1,0 +1,10 @@
+*~
+*#
+*.html
+*.so
+build
+*.txt
+*.pyc
+*.c
+*.cpp
+*.lprof
