@@ -63,11 +63,12 @@ if __name__ == '__main__':
     #from pyevtk.hl import imageToVTK 
     #save = np.zeros((nx, ny, 1))
 
+    nthreads = 4
     import time
     t = time.time()
 
     for i in xrange(nrep):
-        d2q9.one_time_step(f1, f2)
+        d2q9.one_time_step(f1, f2, nthreads)
         tmp = f1
         f1 = f2
         f2 = tmp

@@ -7,6 +7,7 @@ nrep = 100
 
 storage = [(nx, ny, ns), (ns, nx, ny)]
 
+# modules to test
 mod2test = ["d2q9_nxnyns_parakeet",
             "d2q9_nxnyns_numba", 
             "d2q9_nxnyns_pythran",
@@ -14,6 +15,7 @@ mod2test = ["d2q9_nxnyns_parakeet",
             "d2q9_nxnyns_cython"]
             #"d2q9_nxnyns_numba_cuda"]
 
+#functions to test
 f2test = ["one_time_step"]
 
 is_cuda = [False]*5 + [True]
@@ -55,17 +57,20 @@ for indf in xrange(len(f2test)):
             m = cuda.to_device(m_cpu)
             f = cuda.to_device(f_cpu)
 
-        # t = time.time()
-        # exec mod + '.' + func + ext 
-        # print 'compilation time for ' + mod, time.time()-t
+        # execute the function one time to not have 
+        # the compile time in the benchmark
+        if is_cuda[indm]:
+            exec mod + '.periodic_bc[cu_blocks, cu_threads](f)'
+            exec mod + '.one_time_step[cu_blocks, cu_threads](f, m)'
+        else:
+            exec mod + '.' + func + ext 
+
+
         t = time.time()
         if is_cuda[indm]:
             for i in xrange(nrep):
                 exec mod + '.periodic_bc[cu_blocks, cu_threads](f)'
                 exec mod + '.one_time_step[cu_blocks, cu_threads](f, m)'
-                tmp = f
-                f = m
-                m = tmp
         else:
             for i in xrange(nrep):
                 exec mod + '.' + func + ext 

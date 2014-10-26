@@ -7,6 +7,7 @@ nrep = 10
 
 storage = [(nx, ny, ns), (ns, nx, ny)]
 
+# modules to test
 mod2test = ["d2q9_nsnxny_vec",
             #"d2q9_nsnxny_vec_parakeet", 
             #"d2q9_nsnxny_vec_numba", 
@@ -17,24 +18,7 @@ mod2test = ["d2q9_nsnxny_vec",
             "d2q9_nxnyns_cython", 
             ]
 
-# mod2test = [#"d2q9_nxnyns_vec", 
-#             "d2q9_nsnxny_vec",
-#             #"d2q9_nxnyns_vec_pythran", 
-#             "d2q9_nxnyns_loop_pythran",
-#             #"d2q9_nsnxny_vec_pythran", 
-#             #"d2q9_nsnxny_loop_pythran", 
-#             #"d2q9_nxnyns_vec_numba", 
-#             "d2q9_nxnyns_loop_numba", 
-#             #"d2q9_nsnxny_vec_numba", 
-#             #"d2q9_nsnxny_loop_numba",
-#             #"d2q9_nxnyns_vec_parakeet", 
-#             "d2q9_nxnyns_loop_parakeet", 
-#             #"d2q9_nsnxny_vec_parakeet", 
-#             #"d2q9_nsnxny_loop_parakeet",
-#             "d2q9_nxnyns_cython", 
-#             #"d2q9_nsnxny_cython",
-#             ]
-
+#functions to test
 f2test = ["m2f(m, f)",
           "f2m(f, m)",
           "transport(f)",
@@ -61,6 +45,8 @@ for indf in xrange(len(f2test)):
         m = np.zeros(storage[s])
         f = np.zeros(storage[s])
 
+        # execute the function one time to not have 
+        # the compile time in the benchmark
         exec mod + '.' + func
 
         t = time.time()
@@ -68,9 +54,9 @@ for indf in xrange(len(f2test)):
             exec mod + '.' + func
 
         tab[indm, indf] = (time.time() - t)/nrep
-        print func, tab[indm, indf]
         mlups[indm, indf] = nx*ny/tab[indm, indf]*1e-6
           
+
 pourcent = tab/np.sum(tab, axis=0)
 
 for indf in xrange(len(f2test)):
