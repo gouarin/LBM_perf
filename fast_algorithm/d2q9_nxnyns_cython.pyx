@@ -46,23 +46,23 @@ cdef void getf(double[:, :, ::1] f, double *floc, int i, int j) nogil:
     floc[8] = f[i-1, j+1, 8]
 
 cdef void setf(double[:, :, ::1] f, double *floc, int i, int j) nogil:
-    f[j, i, 0] = floc[0]
-    f[j, i, 1] = floc[1]
-    f[j, i, 2] = floc[2]
-    f[j, i, 3] = floc[3]
-    f[j, i, 4] = floc[4]
-    f[j, i, 5] = floc[5]
-    f[j, i, 6] = floc[6]
-    f[j, i, 7] = floc[7]
-    f[j, i, 8] = floc[8]
+    f[i, j, 0] = floc[0]
+    f[i, j, 1] = floc[1]
+    f[i, j, 2] = floc[2]
+    f[i, j, 3] = floc[3]
+    f[i, j, 4] = floc[4]
+    f[i, j, 5] = floc[5]
+    f[i, j, 6] = floc[6]
+    f[i, j, 7] = floc[7]
+    f[i, j, 8] = floc[8]
 
 cdef void relaxation_loc(double *m) nogil:
-    m[3] += 1.1312217194570136*(-2*m[0] + 3.0*m[1]*m[1] + 3.0*m[2]*m[2] - m[3])
-    m[4] += 1.1312217194570136*(m[0] + 1.5*m[1]*m[1] + 1.5*m[2]*m[2] - m[4])
-    m[5] += 1.1312217194570136*(-1.0*m[1] - m[5])
-    m[6] += 1.1312217194570136*(-1.0*m[2] - m[6])
-    m[7] += 1.8573551263001487*(1.0*m[1]*m[1] - 1.0*m[2]*m[2] - m[7])
-    m[8] += 1.8573551263001487*(1.0*m[1]*m[2] - m[8])
+    m[3] += 0.788643533123*(-2*m[0] + 3.0*m[1]*m[1] + 3.0*m[2]*m[2] - m[3])
+    m[4] += 0.788643533123*(m[0] + 1.5*m[1]*m[1] + 1.5*m[2]*m[2] - m[4])
+    m[5] += 0.788643533123*(-m[1] - m[5])
+    m[6] += 0.788643533123*(-m[2] - m[6])
+    m[7] += 1.73370319001*(m[1]*m[1] - 1.0*m[2]*m[2] - m[7])
+    m[8] += 1.73370319001*(m[1]*m[2] - m[8])
 
 cdef periodic_bc(double[:, :, ::1] f):
     cdef:
@@ -80,16 +80,16 @@ cdef periodic_bc(double[:, :, ::1] f):
             f[0, j, k] = f[nx-2, j, k]
             f[nx-1, j, k] = f[1, j, k]
 
-def one_time_step(double[:, :, ::1] f1, double[:, :, ::1] f2):
+def one_time_step(double[:, :, ::1] f1, double[:, :, ::1] f2, int nthreads):
     cdef:
         double *floc
         double *mloc
         int i, j
         int nx = f1.shape[0]
         int ny = f1.shape[1]
-        
+
     periodic_bc(f1)
-    with nogil, parallel():
+    with nogil, parallel(num_threads=nthreads):
         floc = <double *> malloc(9*sizeof(double))
         mloc = <double *> malloc(9*sizeof(double))
 

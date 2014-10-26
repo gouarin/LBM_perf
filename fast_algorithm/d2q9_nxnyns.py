@@ -1,6 +1,5 @@
 import numpy as np
 
-#pythran export m2f_loc(float64 [], float64 []) 
 def m2f_loc(m, f):
     c0 = 1./6
     c1 = 1./9  
@@ -18,7 +17,6 @@ def m2f_loc(m, f):
     f[7] = c1*m[0] - c0*m[1] - c0*m[2] + c2*m[3] + c3*m[4] - c4*m[5] - c4*m[6] + 0.25*m[8]
     f[8] = c1*m[0] + c0*m[1] - c0*m[2] + c2*m[3] + c3*m[4] + c4*m[5] - c4*m[6] - 0.25*m[8]
 
-#pythran export f2m_loc(float64 [], float64 []) 
 def f2m_loc(f, m):
     m[0] = f[0] + f[1] + f[2] + f[3] + f[4] + f[5] + f[6] + f[7] + f[8]
     m[1] = f[1] - f[3] + f[5] - f[6] - f[7] + f[8]
@@ -30,7 +28,6 @@ def f2m_loc(f, m):
     m[7] = f[1] - f[2] + f[3] - f[4]
     m[8] = f[5] - f[6] + f[7] - f[8]
 
-#pythran export getf(float64 [][][], float64 [], int, int) 
 def getf(f, floc, i, j):
     floc[0] = f[i, j, 0]
     floc[1] = f[i-1, j, 1]
@@ -42,26 +39,24 @@ def getf(f, floc, i, j):
     floc[7] = f[i+1, j+1, 7]
     floc[8] = f[i-1, j+1, 8]
 
-#pythran export setf(float64 [][][], float64 [], int, int) 
 def setf(f, floc, i, j):
-    f[j, i, 0] = floc[0]
-    f[j, i, 1] = floc[1]
-    f[j, i, 2] = floc[2]
-    f[j, i, 3] = floc[3]
-    f[j, i, 4] = floc[4]
-    f[j, i, 5] = floc[5]
-    f[j, i, 6] = floc[6]
-    f[j, i, 7] = floc[7]
-    f[j, i, 8] = floc[8]
+    f[i, j, 0] = floc[0]
+    f[i, j, 1] = floc[1]
+    f[i, j, 2] = floc[2]
+    f[i, j, 3] = floc[3]
+    f[i, j, 4] = floc[4]
+    f[i, j, 5] = floc[5]
+    f[i, j, 6] = floc[6]
+    f[i, j, 7] = floc[7]
+    f[i, j, 8] = floc[8]
 
-#pythran export relaxation_loc(float64 []) 
 def relaxation_loc(m):
-    m[3] += 1.1312217194570136*(-2*m[0] + 3.0*m[1]*m[1] + 3.0*m[2]*m[2] - m[3])
-    m[4] += 1.1312217194570136*(m[0] + 1.5*m[1]*m[1] + 1.5*m[2]*m[2] - m[4])
-    m[5] += 1.1312217194570136*(-m[1] - m[5])
-    m[6] += 1.1312217194570136*(-m[2] - m[6])
-    m[7] += 1.8573551263001487*(m[1]*m[1] - m[2]*m[2] - m[7])
-    m[8] += 1.8573551263001487*(m[1]*m[2] - m[8])
+    m[3] += 0.788643533123*(-2*m[0] + 3.0*m[1]*m[1] + 3.0*m[2]*m[2] - m[3])
+    m[4] += 0.788643533123*(m[0] + 1.5*m[1]*m[1] + 1.5*m[2]*m[2] - m[4])
+    m[5] += 0.788643533123*(-m[1] - m[5])
+    m[6] += 0.788643533123*(-m[2] - m[6])
+    m[7] += 1.73370319001*(m[1]*m[1] - 1.0*m[2]*m[2] - m[7])
+    m[8] += 1.73370319001*(m[1]*m[2] - m[8])
 
 #pythran export periodic_bc(float64 [][][]) 
 def periodic_bc(f):
@@ -83,6 +78,7 @@ def one_time_step(f1, f2):
     mloc = np.zeros(ns)    
     
     periodic_bc(f1)
+    "omp parallel for"
     for i in range(1, nx-1):
         for j in range(1, ny-1):
             getf(f1, floc, i, j)
